@@ -13,6 +13,7 @@
             <input type="text" placeholder="Enter the city name" spellcheck="false">
             <button><img src="./images/search.png" alt="search"></button>
         </div>
+        <div class="error">Invalid City name</div>
         <div class="weather">
             <img src="./images/rain.png" alt="" class="weather-icon">
             <h1 class="temp">22 °C</h1>
@@ -45,9 +46,12 @@
     const input =document.querySelector('input')
     const button=document.querySelector('button')
     const temp=document.querySelector('.temp')
-    const cityName=document.querySelector('city')
+    const cityName=document.querySelector('.city')
     const humidity=document.querySelector('.humidity')
+    const weatherIcon=document.querySelector('.weather-icon')
     const wind=document.querySelector('.wind')
+
+    const weatherTemplate=document.querySelector('.weather')
 
     button.addEventListener('click',function(e){
 
@@ -64,16 +68,51 @@
     }
 
     function tempChange(temprature){
-        temp.innerHTML=temprature
+       
+        temp.innerHTML=Math.floor(parseInt(temprature))+" °c"
     }
     const apiKey="6b1fadd4288d9994d80acf2b746513e4"
-    const apiUrl="https://api.openweathermap.org/data/2.5/weather?&units=metric&q=bangalore"
-    const url='https://api.openweathermap.org/data/2.5/weather?q=india&appid=6b1fadd4288d9994d80acf2b746513e4&units=metric'
-    async function getWeatherInfo(){
+    const apiUrl="https://api.openweathermap.org/data/2.5/weather?&units=metric&q="
+   
+    async function getWeatherInfo(city){
          try{
-             const response=await fetch(apiUrl +`&appid=${apiKey}`)
+             const response=await fetch(apiUrl + city +`&appid=${apiKey}`)
+             if(response.status===404){
+                document.querySelector('.error').style.display='block'
+                weatherTemplate.style.display='none'
+
+             }else{
+                const data=await response.json()
+
+             tempChange(data.main.temp)
+             showHumidity(data.main.humidity+"%")
+             windSpeed(data.wind.speed+" km/hr")
+             showCity(data.name)
+
+
+             if(data.weather[0].main==='clouds'){
+                eatherIcon.src='images/clouds.png';
+             } else  if(data.weather[0].main==='rain'){
+                eatherIcon.src='images/rain.png';
+             }else  if(data.weather[0].main==='mist'){
+                eatherIcon.src='images/mist.png';
+             }else  if(data.weather[0].main==='clear'){
+                eatherIcon.src='images/clear.png';
+             }else  if(data.weather[0].main==='drizzle'){
+                eatherIcon.src='images/drizzle.png';
+             }
+             weatherTemplate.style.display='block'
+             document.querySelector('.error').style.display='none'
+
+
+             }
             // console.log( typeof response)
-             const data=await response.json()
+             
+             
+
+             
+
+            //console.log(data.name)
      
              //console.log(data.wind.speed)
      
@@ -84,9 +123,29 @@
     
 }
 
-getWeatherInfo()
+button.addEventListener('click',function(){
+    if(input.value===''){
+        alert('Please Enter the  city name')
 
-console.log()
+    } 
+    else if( !isNaN(input.value) ){
+        document.querySelector('.error').style.display='block'
+        weatherTemplate.style.display='none'
+
+        //
+    }
+    else{
+        getWeatherInfo(input.value)
+        document.querySelector('.error').style.display='none'
+   
+       input.value=''
+    }
+   
+
+})
+
+
+
 </script>
-<script src="./index.js"></script>
+<!-- <script src="./index.js"></script> -->
 </html>
